@@ -38,6 +38,10 @@ services:
     environment:
       SOLR_DEFAULT_CONFIG_SET: $SOLR_CONFIG_SET
       SOLR_HEAP: 1024m
+    expose:
+      - "8983"
+    ports:
+      - "8983:8983"
     labels:
       - "traefik.http.routers.${PROJECT_NAME}_solr.rule=Host(`solr.${PROJECT_BASE_URL}`)"
       - "--whitelisted-ips="

@@ -51,6 +51,8 @@ RUN set -ex; \
     chown -R solr:solr /opt/docker-solr/configsets; \
     \
     apk del --purge .solr-build-deps; \
+    apk add --no-cache \
+        openssl; \
     rm -rf \
         /tmp/configsets \
         /tmp/search-api-solr \
