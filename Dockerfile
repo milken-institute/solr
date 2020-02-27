@@ -57,7 +57,33 @@ RUN set -ex; \
         /tmp/configsets \
         /tmp/search-api-solr \
         /opt/solr/server/solr/mycores \
-        /var/cache/apk/*
+        /var/cache/apk/; \
+
+    keytool \
+        -genkeypair \
+        -alias solr-ssl \
+        -keyalg RSA \
+        -keysize 2048 \
+        -keypass secret \
+        -storepass secret \
+        -validity 9999 \
+        -keystore solr-ssl.keystore.jks \
+        -ext SAN=DNS:milken-dev.reapbooster.com,IP:157.230.167.60,IP:127.0.0.1 \
+        -dname "CN=milken-dev.reapbooster.com, OU=Milken Institute Drupal, O=MI, L=Santa Monica, ST=CA, C=USA"; \
+
+    keytool \
+        -importkeystore \
+        -srckeystore solr-ssl.keystore.jks \
+        -destkeystore solr-ssl.keystore.p12 \
+        -srcstoretype jks \
+        -deststoretype pkcs12 ; \
+
+    openssl \
+        pkcs12 \
+        -in solr-ssl.keystore.p12 \
+        -out solr-ssl.pem; \
+
+
 
 COPY bin /usr/local/bin
 COPY entrypoint.sh /
@@ -69,3 +95,5 @@ WORKDIR /opt/solr/server/solr
 
 ENTRYPOINT ["/entrypoint.sh"]
 CMD ["solr-foreground"]
+
+EXPOSE 8983:8983/tcp
