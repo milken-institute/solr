@@ -6,7 +6,11 @@ SOLR_MINOR_VER=$(shell echo "${SOLR_VER}" | grep -oE '^[0-9]+\.[0-9]+')
 TAG ?= $(SOLR_MINOR_VER)
 
 REPO = wodby/solr
-NAME = solr-$(SOLR_VER)
+# NAME = solr-$(SOLR_VER)
+
+NAME = solr
+
+NETWORK = --network=solr-proxy_solr-network
 
 PORTS = -p 8983:8983/tcp
 
@@ -38,10 +42,10 @@ root-shell:
 	docker exec -it --user=root $(NAME) sh
 
 run:
-	docker run --rm --name $(NAME) -e DEBUG=1 $(PORTS) $(VOLUMES) $(ENV) $(REPO):$(TAG) $(CMD)
+	docker run --rm --name $(NAME) -e DEBUG=1 $(NETWORK) $(PORTS) $(VOLUMES) $(ENV) $(REPO):$(TAG) $(CMD)
 
 start:
-	docker run -d --name $(NAME) $(PORTS) $(VOLUMES) $(ENV) $(REPO):$(TAG)
+	docker run -d --name $(NAME) $(NETWORK) $(PORTS) $(VOLUMES) $(ENV) $(REPO):$(TAG)
 
 stop:
 	docker stop $(NAME)

@@ -1,49 +1,12 @@
 version: "3"
 
 services:
-
-  php:
-    image: wodby/drupal-php:$PHP_TAG
-    container_name: "${PROJECT_NAME}_php"
-    environment:
-      PHP_SENDMAIL_PATH: /usr/sbin/sendmail -t -i -S mailhog:1025
-#      PHP_SENDMAIL_PATH: /usr/sbin/sendmail -t -i -S opensmtpd:25
-      DB_HOST: $DB_HOST
-      DB_PORT: $DB_PORT
-      DB_USER: $DB_USER
-      DB_PASSWORD: $DB_PASSWORD
-      DB_NAME: $DB_NAME
-      DB_DRIVER: $DB_DRIVER
-      PHP_FPM_USER: wodby
-      PHP_FPM_GROUP: wodby
-      COLUMNS: 80 # Set 80 columns for docker exec -it.
-
-  nginx:
-    image: wodby/nginx:$NGINX_TAG
-    container_name: "${PROJECT_NAME}_nginx"
-    depends_on:
-      - php
-    environment:
-      NGINX_STATIC_OPEN_FILE_CACHE: "off"
-      NGINX_ERROR_LOG_LEVEL: debug
-      NGINX_BACKEND_HOST: php
-      NGINX_SERVER_ROOT: /var/www/html/web
-      NGINX_VHOST_PRESET: $NGINX_VHOST_PRESET
-    volumes:
-      - ./:/var/www/html
-
   solr:
-    image: wodby/solr:$SOLR_TAG
-    container_name: "${PROJECT_NAME}_solr"
-    environment:
-      SOLR_DEFAULT_CONFIG_SET: $SOLR_CONFIG_SET
-      SOLR_HEAP: 1024m
+    image: wodby/solr:$TAG
+    container_name: "custom_solr"
+    env_file:
+      - .env
     expose:
       - "8983"
     ports:
       - "8983:8983"
-    labels:
-      - "traefik.http.routers.${PROJECT_NAME}_solr.rule=Host(`solr.${PROJECT_BASE_URL}`)"
-      - "--whitelisted-ips="
-
-
